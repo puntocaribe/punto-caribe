@@ -354,6 +354,88 @@ header .container{ padding-top:12px; padding-bottom:12px; }
 .hero .badge{ padding:6px 10px; font-size:.85rem; }
 
 </style>
+
+<style>
+/* ======== Ajustes SOLO para pantallas móviles (≤ 768px) ======== */
+@media (max-width: 768px){
+
+  :root{
+    --space: clamp(10px, 3.5vw, 18px);
+    --radius: 14px;
+  }
+
+  /* Contenedores con padding lateral en móvil */
+  .container{ padding-left: var(--space); padding-right: var(--space); }
+
+  /* Header más compacto en pantallas pequeñas */
+  header .container{ padding-top: 8px; padding-bottom: 8px; }
+  .brand{ gap: 10px; }
+  .brand img{ height: clamp(44px, 12vw, 80px); width: auto; }
+  .brand h1{ font-size: clamp(1.05rem, 4vw, 1.25rem); }
+
+  /* Toolbar apilada y respirable en móvil */
+  .toolbar{ grid-template-columns: 1fr !important; gap: 8px 10px; }
+  .search{ min-height: 40px; padding: 8px 10px; }
+  .search input{ font-size: .95rem; }
+
+  /* Chips más chicos */
+  .chip{ padding: 6px 10px; font-size: .88rem; }
+
+  /* Banda hero compacta */
+  .hero{
+    margin-top: 8px; padding: var(--space);
+    border-radius: var(--radius);
+  }
+  .hero h3{ margin: 0 0 6px; font-size: clamp(1rem, 3.8vw, 1.1rem); }
+  .badges{ gap: 6px; }
+  .badge{ padding: 5px 9px; font-size: .84rem; }
+
+  /* Cards y miniaturas fluidas */
+  .card{ border-radius: var(--radius); }
+  .card .body{ padding: 12px; }
+  .title{ font-size: 1rem; margin-bottom: 4px; }
+  .meta{ font-size: .86rem; }
+  .price{ font-size: 1rem; }
+
+  .card .thumb{
+    height: clamp(120px, 42vw, 190px) !important;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .card .thumb img{
+    padding: clamp(2px, 1vw, 6px);
+    object-fit: contain;
+  }
+
+  /* Suavizar hover en táctil */
+  .thumb:hover, .thumb img:hover{ transform:none !important; box-shadow:none !important; }
+
+  /* Grilla más densa en pantallas angostas */
+  .grid{ gap: clamp(10px, 2.6vw, 14px); }
+  .catalog #grid{
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  }
+
+  /* Layout catálogo + carrito */
+  .shop{ gap: var(--space) !important; }
+  .cart-box{ position: static; }
+  .cart h3{ font-size: 1rem; }
+  .checkout{ gap: 8px; padding: 10px; }
+  .whats, .clear{ padding: 10px; border-radius: 10px; }
+
+}
+
+/* Micro-ajustes de tipografía en pantallas muy pequeñas */
+@media (max-width: 360px){
+  .title{ font-size: .95rem; }
+  .meta, .chip{ font-size: .82rem; }
+  .btn{ padding: 8px 10px; border-radius: 10px; }
+}
+
+/* Mejor anclaje al navegar por secciones en iOS (sin afectar desktop) */
+@supports (scroll-margin-top: 1px){
+  [id]{ scroll-margin-top: 80px; }
+}
+</style>
 </head>
 <body>
 
