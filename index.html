@@ -488,7 +488,7 @@ header .container{ padding-top:12px; padding-bottom:12px; }
 	<button class="chip" data-cat="Chucherías">Chucherías / Dulces</button>
         <button class="chip" data-cat="Bebidas">Bebidas</button>
 	<button class="chip" data-cat="Congelados">Congelados</button>
-	<button class="chip" data-cat="Panes & Dulces">Panes & Dulces</button>
+	<button class="chip" data-cat="Panaderia">Panaderia</button>
 	<button class="chip" data-cat="Postres">Postres</button>
       </div>
       <div>
@@ -1066,8 +1066,28 @@ const PANES_DULCES = [
 /* PULPAS */
 const PULPAS = [
   {
-    id:"pulpa-maracuya-guayaba-tamarindo-500",
-    name:"Pulpa (Maracuyá / Guayaba / Tamarindo) 500g",
+    id:"pulpa-maracuya-500",
+    name:"Pulpa Maracuyá 500g",
+    cat:"Congelados",
+    emoji:"🍹",
+    image:"assets/imagen-productos/pulpa-congelada-500g.webp",
+    tiers:[
+	{label:"500 g x $6.000", qty:1, price:6000}
+    ]
+  },
+	 {
+    id:"pulpa-guayaba-500",
+    name:"Pulpa Guayaba 500g",
+    cat:"Congelados",
+    emoji:"🍹",
+    image:"assets/imagen-productos/pulpa-congelada-500g.webp",
+    tiers:[
+	{label:"500 g x $6.000", qty:1, price:6000}
+    ]
+  },
+	 {
+    id:"pulpa-tamarindo-500",
+    name:"Pulpa Tamarindo 500g",
     cat:"Congelados",
     emoji:"🍹",
     image:"assets/imagen-productos/pulpa-congelada-500g.webp",
