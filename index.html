@@ -483,13 +483,14 @@ header .container{ padding-top:12px; padding-bottom:12px; }
         <input id="q" type="search" placeholder="Buscar productos (ej: harina, malta, chocolate)..." />
       </div>
       <div class="filters">
-        <button class="chip active" data-cat="all">Todos</button>
-        <button class="chip" data-cat="Almacén">Almacén</button>
+    <button class="chip active" data-cat="all">Todos</button>
+    <button class="chip" data-cat="Almacén">Almacén</button>
 	<button class="chip" data-cat="Chucherías">Chucherías / Dulces</button>
-        <button class="chip" data-cat="Bebidas">Bebidas</button>
+    <button class="chip" data-cat="Bebidas">Bebidas</button>
 	<button class="chip" data-cat="Congelados">Congelados</button>
 	<button class="chip" data-cat="Panaderia">Panaderia</button>
 	<button class="chip" data-cat="Postres">Postres</button>
+  	<button class="chip" data-cat="Lácteos">Postres</button>
       </div>
       <div>
 
@@ -729,7 +730,7 @@ const LACTEOS = [
   },
   { id:"mayonesa-mavesa-445",
     name:"Mayonesa Mavesa 445 g",
-    cat:"Lácteos", emoji:"🥪",
+    cat:"Almacén", emoji:"🥪",
     image:"assets/imagen-productos/mayonesa-mavesa-445.webp",
     tiers:[ {label:"1 x $15.000", qty:1, price:15000}
     ]
@@ -981,7 +982,7 @@ const PANES_DULCES = [
   {
     id:"catalinas-paledonias-5",
     name:"Catalinas / Paledonias (5 unid)",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🍪",
     image:"assets/imagen-productos/catalinas-paledonias-5.webp",
     tiers:[
@@ -991,7 +992,7 @@ const PANES_DULCES = [
   },
   { id:"pan-arabe-10",   
     name:"Pan Árabe (10 unid)",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🥙",
     image:"assets/imagen-productos/pan-arabe.webp",
     tiers:[
@@ -1000,7 +1001,7 @@ const PANES_DULCES = [
   },
   { id:"pan-queso-grande",
     name:"Pan de queso grande",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🥖",
     image:"assets/imagen-productos/pan-de-queso.webp",
     tiers:[
@@ -1009,7 +1010,7 @@ const PANES_DULCES = [
   },
   { id:"pan-guayaba-4",
     name:"Pan de guayaba (4 unid)",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🥖",
     image:"assets/imagen-productos/pan-de-guayaba.webp",
     tiers:[
@@ -1018,7 +1019,7 @@ const PANES_DULCES = [
   },
   { id:"pan-andino",
     name:"Pan andino",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🍞",
     image:"assets/imagen-productos/pan-andino.webp",
     tiers:[
@@ -1027,7 +1028,7 @@ const PANES_DULCES = [
   },
   { id:"pan-pinita-4",
     name:"Pan piñita (4 unid)",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🥖",
     image:"assets/imagen-productos/pan-pinita.webp",
     tiers:[
@@ -1045,7 +1046,7 @@ const PANES_DULCES = [
   },
   { id:"besitos-coco",
     name:"Besitos de coco",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🥥",
     image:"assets/imagen-productos/besitos-de-coco.webp",
     tiers:[
@@ -1054,7 +1055,7 @@ const PANES_DULCES = [
   },
   { id:"palmeritas-5",
     name:"Palmeritas (5 unid)",
-    cat:"Panes & Dulces",
+    cat:"Panaderia",
     emoji:"🥐",
     image:"assets/imagen-productos/palmeritas-5.webp",
     tiers:[
@@ -2081,7 +2082,7 @@ const PRODUCTS = [
   ...CONGELADOS,
   ...ALMACEN,
   ...CAFES,
-  ...PANES_DULCES,
+  ...PANADERIA,
   ...PULPAS,
   ...CONDISALSAS,
   ...NAVIDAD,
