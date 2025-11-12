@@ -2245,12 +2245,11 @@ function loadCart(){
 }
 
 // ====== WhatsApp Checkout ======
-// ====== WhatsApp Checkout (simple) ======
 function checkoutWhatsApp(){
   const lines = Object.values(state.cart);
   if(!lines.length){ alert("Tu carrito está vacío."); return; }
 
-  // Usa tu helper money() si ya existe; si no, queda este fallback:
+  // Usa tu helper money() si ya existe; si no, este fallback
   const moneyFn = (typeof money === "function")
     ? money
     : (n => new Intl.NumberFormat('es-AR', { style:'currency', currency:'ARS' }).format(n || 0));
@@ -2266,11 +2265,8 @@ function checkoutWhatsApp(){
     const total    = unit * qty;
     sub += total;
 
-    // Presentación sin el trailing " x $...." si tu label lo trae (ej: "1 kg x $9.900")
-    const present  = String(tier.label || item.unit || "Unidad").replace(/\s*x\s*\$?\s*[\d.,]+$/,"").trim();
-
-    // Línea clara: Nombre — Presentación — QTY x $Unit = $Total
-    parts.push(`• ${item.name} — ${present} — ${qty} x ${moneyFn(unit)} = ${moneyFn(total)}`);
+    // 👉 Formato simple: "• Nombre - QTY x $Unit = $Total"
+    parts.push(`• ${item.name} - ${qty} x ${moneyFn(unit)} = ${moneyFn(total)}`);
   });
 
   parts.push(
