@@ -532,6 +532,7 @@ header .container{ padding-top:12px; padding-bottom:12px; }
         <div class="checkout">
           <button class="clear" id="clearBtn">Vaciar</button>
           <button class="whats" id="buyBtn">Comprar por WhatsApp</button>
+ 		  <button class="clear" onclick="openRemito()">Generar remito</button>
         </div>
       </div>
     </aside>
@@ -2283,6 +2284,173 @@ function checkoutWhatsApp(){
   const msg = parts.join("\n");
   const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER)}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
+}
+// ====== Remito / Comprobante imprimible ======
+function openRemito(){
+  const lines = Object.values(state.cart);
+  if(!lines.length){ alert("Tu carrito está vacío."); return; }
+
+  // Usa tu money() si ya existe
+  const moneyFn = (typeof money === "function")
+    ? money
+    : (n => new Intl.NumberFormat('es-AR', { style:'currency', currency:'ARS' }).format(n || 0));
+
+  // Logo: toma el de tu header si existe; si no, usa el fallback
+  const headerLogo = document.querySelector('.brand img');
+  const LOGO_URL =
+    (headerLogo && headerLogo.src) ||
+    '/assets/logo-punto-caribe.png'; // ← poné aquí la ruta real en tu servidor si hace falta
+
+  // Colores de marca (ajustá si querés)
+  const COLORS = {
+    primary: '#14b8a6', // turquesa Punto Caribe
+    dark:    '#0f172a',
+    mid:     '#334155',
+    light:   '#f1f5f9',
+    line:    '#e2e8f0'
+  };
+
+  // Subtotal
+  const sub = lines.reduce((a, c)=>{
+    const hasTiers = Array.isArray(c.item.tiers) && c.item.tiers.length;
+    const price    = hasTiers ? (c.item.tiers[c.tierIndex]?.price || 0) : (c.item.price || 0);
+    return a + c.qty * price;
+  }, 0);
+
+  // Filas del detalle (FORMATO: Nombre - QTY x $Unit = $Total)
+  const rows = lines.map(({qty,item,tierIndex=0})=>{
+    const hasTiers = Array.isArray(item.tiers) && item.tiers.length;
+    const tier     = hasTiers ? item.tiers[tierIndex] : { label:(item.unit||"Unidad"), price:(item.price||0) };
+    const unit     = Number(tier.price||0);
+    const total    = unit * qty;
+
+    return `
+      <tr>
+        <td class="prod">${item.name}</td>
+        <td class="qty">${qty}</td>
+        <td class="unit">${moneyFn(unit)}</td>
+        <td class="importe">${moneyFn(total)}</td>
+      </tr>`;
+  }).join("");
+
+  // Número y fecha del remito
+  const now   = new Date();
+  const fecha = now.toLocaleString('es-AR');
+  const nro   = "PC-" + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + "-" + now.getTime();
+
+  // HTML del remito
+  const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Remito - Punto Caribe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --pc-primary: ${COLORS.primary};
+    --pc-dark: ${COLORS.dark};
+    --pc-mid: ${COLORS.mid};
+    --pc-light: ${COLORS.light};
+    --pc-line: ${COLORS.line};
+  }
+  @page{ size: A4; margin: 16mm; }
+  *{ box-sizing:border-box }
+  body{
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+    color: var(--pc-dark); margin:0; padding:24px;
+  }
+  .head{ display:flex; justify-content:space-between; align-items:center; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand img{ height:48px; width:auto; object-fit:contain }
+  .brand .name{ font-weight:800; font-size:20px; letter-spacing:.3px }
+  .meta{ text-align:right; }
+  .tag{ display:inline-block; padding:4px 10px; border-radius:999px; background:var(--pc-light); color:var(--pc-mid); font-weight:600; font-size:12px }
+  .muted{ color:var(--pc-mid); font-size:13px; margin-top:6px }
+
+  .hr{ height:3px; background: linear-gradient(90deg, var(--pc-primary), #0ea5e9); border-radius:4px; margin:16px 0 10px; }
+
+  h2{ margin:12px 0 6px; font-size:16px }
+  table{ width:100%; border-collapse:collapse; margin-top:6px }
+  thead th{
+    text-align:left; padding:10px; background:#f8fafc; color:#0b1220; border-bottom:1px solid var(--pc-line);
+    font-size:13px; letter-spacing:.3px;
+  }
+  td{ padding:10px; border-bottom:1px solid var(--pc-line) }
+  td.qty{ text-align:center; width:70px }
+  td.unit, td.importe{ text-align:right; width:120px; white-space:nowrap }
+  .totals{ margin-top:12px; text-align:right; }
+  .totals .row{ margin:3px 0 }
+  .totals .label{ color:var(--pc-mid) }
+  .totals .value{ font-weight:700 }
+  .foot{ margin-top:18px; color:var(--pc-mid); font-size:13px }
+  .foot strong{ color:var(--pc-dark) }
+
+  .noprint{ margin-top:20px }
+  .btn{ padding:10px 14px; border-radius:10px; border:1px solid var(--pc-line); background:white; cursor:pointer; }
+  .btn-primary{ background:var(--pc-primary); color:white; border-color:transparent }
+
+  @media print{
+    .noprint{ display:none }
+    body{ padding:0 }
+  }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand">
+      <img src="${LOGO_URL}" alt="Punto Caribe" />
+      <div class="name">Punto Caribe</div>
+    </div>
+    <div class="meta">
+      <div class="tag">${nro}</div>
+      <div class="muted">${fecha}</div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2>Detalle del pedido</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th style="text-align:center">Cant.</th>
+        <th style="text-align:right">P. unit</th>
+        <th style="text-align:right">Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows || `<tr><td colspan="4" class="muted">Sin ítems en el carrito.</td></tr>`}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div class="row"><span class="label"><strong>Subtotal:</strong></span> <span class="value">${moneyFn(sub)}</span></div>
+    <div class="row"><span class="label"><strong>Envío:</strong></span> <span class="value">A consultar</span></div>
+    <div class="row"><span class="label"><strong>Total:</strong></span> <span class="value">${moneyFn(sub)}</span></div>
+  </div>
+
+  <div class="foot">
+    <p><strong>Datos para coordinar entrega</strong></p>
+    <p>Nombre: ________________________________</p>
+    <p>Dirección: ______________________________</p>
+    <p>Método de pago: ________________________</p>
+  </div>
+
+  <div class="noprint">
+    <button class="btn" onclick="window.close()">Cerrar</button>
+    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+  </div>
+</body>
+</html>
+  `;
+
+  const w = window.open('', 'remito_puntocaribe');
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
 }
 
 // ====== Eventos ======
