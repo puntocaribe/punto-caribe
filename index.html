@@ -2245,24 +2245,47 @@ function loadCart(){
 }
 
 // ====== WhatsApp Checkout ======
+// ====== WhatsApp Checkout (simple) ======
 function checkoutWhatsApp(){
   const lines = Object.values(state.cart);
   if(!lines.length){ alert("Tu carrito está vacío."); return; }
 
-  const sub = lines.reduce((a,c)=>{
-    const price = (c.item.tiers && c.item.tiers[c.tierIndex]) ? c.item.tiers[c.tierIndex].price : (c.item.price||0);
-    return a + c.qty * price;
-  }, 0);
+  // Usa tu helper money() si ya existe; si no, queda este fallback:
+  const moneyFn = (typeof money === "function")
+    ? money
+    : (n => new Intl.NumberFormat('es-AR', { style:'currency', currency:'ARS' }).format(n || 0));
 
-  const itemsTxt = lines.map(({qty,item,tierIndex=0})=>{
+  const parts = [];
+  parts.push("Hola Punto Caribe 👋", "", "Mi pedido:");
+
+  let sub = 0;
+  lines.forEach(({qty, item, tierIndex=0})=>{
     const hasTiers = Array.isArray(item.tiers) && item.tiers.length;
-    const t        = hasTiers ? item.tiers[tierIndex] : {label:(item.unit||"Unidad"), price:item.price||0};
-    const lineTotal= t.price * qty;
-    return `• ${item.name} — ${t.label} x ${qty} = ${money(lineTotal)}`;
-  }).join("%0A");
+    const tier     = hasTiers ? item.tiers[tierIndex] : { label:(item.unit||"Unidad"), price:(item.price||0) };
+    const unit     = Number(tier.price || 0);
+    const total    = unit * qty;
+    sub += total;
 
-  const msg = `Hola Punto Caribe 👋%0A%0AMi pedido:%0A${itemsTxt}%0A%0ASubtotal: ${money(sub)}%0AEnvío: ${encodeURIComponent(SHIPPING_TEXT)}%0A%0A*Datos para coordinar entrega:*%0ANombre:%0ADirección:%0AMétodo de pago:`;
-  const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER)}?text=${msg}`;
+    // Presentación sin el trailing " x $...." si tu label lo trae (ej: "1 kg x $9.900")
+    const present  = String(tier.label || item.unit || "Unidad").replace(/\s*x\s*\$?\s*[\d.,]+$/,"").trim();
+
+    // Línea clara: Nombre — Presentación — QTY x $Unit = $Total
+    parts.push(`• ${item.name} — ${present} — ${qty} x ${moneyFn(unit)} = ${moneyFn(total)}`);
+  });
+
+  parts.push(
+    "",
+    `Subtotal: ${moneyFn(sub)}`,
+    `Envío: ${SHIPPING_TEXT || "A consultar"}`,
+    "",
+    "Datos para coordinar entrega:",
+    "Nombre:",
+    "Dirección:",
+    "Método de pago:"
+  );
+
+  const msg = parts.join("\n");
+  const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER)}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 }
 
