@@ -135,7 +135,12 @@
     border:none; position:unset; backdrop-filter:none; background:linear-gradient(90deg, #e8ffff, #fff);
   }
   .cart h3{margin:0; padding:14px 16px; color:#064a4a}
-  .cart-list{max-height:360px; overflow:auto; padding:8px 12px}
+  .cart-list{
+	padding: 12px;
+  	padding-bottom: 120px; /* espacio para el footer sticky */
+  	overflow: visible;     /* que no cree un scroll interno */
+  	max-height: none;      /* sin límite aquí */
+}
   .cart-item{
     display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; border-bottom:1px dashed #eee; padding:8px 0
   }
@@ -172,11 +177,16 @@
 
 /* === Fix tarjeta: imagen arriba a todo el ancho + pill sin corte === */
 .card{
-  position: relative;           /* para posicionar la pill encima */
-  display: block;               /* evitamos layout en fila */
-  overflow: hidden;             /* bordes limpios con el radius */
+  position: relative;
+  overflow: hidden;       /* se mantiene para tarjetas de producto */
+  border-radius:16px;
+  background:#fff;
+  border:1px solid #eee;
+  transition:.2s transform, .2s box-shadow;
 }
-
+.card.cart{
+	 overflow: visible;      /* permite que el header/footer sticky respiren */
+}
 /* Miniatura: ocupar todo el ancho de la tarjeta */
 .card .thumb{
   width: 100%;
