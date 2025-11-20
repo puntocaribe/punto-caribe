@@ -128,34 +128,74 @@
   .btn.ghost{background:#fff}
   .btn:active{transform:translateY(1px)}
   /* Cart */
-  .cart{
-    position:sticky;
-	top:84px;
-	border:1px solid #eee;
-	border-radius:16px;
-	background:#fff;
-	overflow:hidden
-  }
-  .cart header{
-    border:none; position:unset; backdrop-filter:none; background:linear-gradient(90deg, #e8ffff, #fff);
-  }
-  .cart h3{margin:0; padding:14px 16px; color:#064a4a}
-  .cart-list{
-	padding: 12px;
-  	padding-bottom: 120px; /* espacio para el footer sticky */
-  	overflow: visible;     /* que no cree un scroll interno */
-  	max-height: none;      /* sin límite aquí */
+.cart{
+  border: 1px solid #eee;
+  border-radius: 16px;
+  background:#fff;
+  overflow: visible;          /* dejamos que el sticky funcione bien */
+  display:flex;
+  flex-direction:column;
 }
-  .cart-item{
-    display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; border-bottom:1px dashed #eee; padding:8px 0
-  }
-  .cart-item .name{font-weight:600}
-  .qty{display:flex; gap:8px; align-items:center}
-  .qty button{width:28px; height:28px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; cursor:pointer}
-  .line{display:flex; justify-content:space-between; padding:10px 14px; font-weight:700}
-  .checkout{
-    display:flex; gap:10px; padding:12px; border-top:1px solid #f0f0f0; background:#fafafa
-  }
+
+/* Header visual del carrito */
+.cart header{
+  border:none;
+  backdrop-filter:none;
+  background:linear-gradient(90deg, #e8ffff, #fff);
+}
+.cart h3{
+  margin:0;
+  padding:14px 16px;
+  color:#064a4a;
+}
+
+/* Lista de ítems del carrito (ocupa el espacio intermedio) */
+.cart-list{
+  flex:1 1 auto;
+  max-height:none !important;
+  overflow:visible !important;
+  padding:12px;
+  padding-bottom:40px;   /* antes era 120px → bajamos a 40px */
+}       /* espacio para los botones fijos */
+
+/* Ítems del carrito */
+.cart-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:6px;
+  align-items:center;
+  border-bottom:1px dashed #eee;
+  padding:8px 0;
+}
+.cart-item .name{ font-weight:600; }
+.qty{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.qty button{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  cursor:pointer;
+}
+.line{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 14px;
+  font-weight:700;
+}
+
+/* Footer del carrito (checkout), lo haremos sticky dentro de .cart-box */
+.checkout{
+  display:flex;
+  gap:10px;
+  padding:12px;
+  border-top:1px solid #f0f0f0;
+  background:#fafafa;
+}
   .whats{
     flex:1; border-radius:12px; border:none; padding:12px; font-weight:800; color:#0b3b3b; cursor:pointer;
     background:linear-gradient(180deg,#34d399,#10b981); color:#062d2d
@@ -165,6 +205,7 @@
     position:absolute; top:10px; left:10px; background:linear-gradient(90deg,#fff7d1,#fff); border:1px solid #ffe28a;
     color:#955c00; font-size:.75rem; font-weight:700; padding:6px 10px; border-radius:999px;
   }
+
   /* Hero band */
   .hero{
     margin-top:14px; border:1px solid #eee; background:
@@ -292,7 +333,11 @@
   .shop{
     grid-template-columns: 1fr !important;
   }
-  .cart-box{ position: static; }
+  .cart-box{ 
+	position: static;
+    max-height:none;
+    overflow:visible;
+  }
 }
 
 /* === Ampliar layout en pantallas grandes === */
