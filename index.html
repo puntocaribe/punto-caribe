@@ -250,10 +250,32 @@
 
 .cart-box{
   position: sticky;
-  top: 96px;
-  height: fit-content;
+  top: 96px;                             /* altura donde empieza el carrito */
+  max-height: calc(100vh - 140px);      /* altura máxima del carrito */
+  overflow-y: auto;                     /* 🔑 scroll SOLO dentro del carrito */
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  border-radius:16px;
+  background:#fff;
+}
+	.cart-box header{
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
+/* Footer (checkout) fijo al fondo del carrito scrollable */
+.cart-box .checkout{
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background:#fff;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.06);
+}
+.cart-box .checkout button{
+  width:100%;
+  margin:6px 0;
+}
 .catalog #grid{
   display: grid;
   gap: 16px;
