@@ -435,6 +435,30 @@ header .container{ padding-top:12px; padding-bottom:12px; }
 }
 .hero .badge{ padding:6px 10px; font-size:.85rem; }
 
+/* Precio por consulta */
+.price-consultar{
+  color: var(--turquesa);
+  font-weight: 700;
+}
+
+  /* Productos por consulta */
+  .consult-badge{
+    position:absolute;
+    right:14px;
+    top:14px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+    color:#064a4a;
+    background:rgba(0,168,168,.12);
+    border:1px solid rgba(0,168,168,.25);
+  }
+  .btn.consult{
+    width:100%;
+  }
+
+
 </style>
 
 <style>
@@ -1496,7 +1520,7 @@ const NAVIDAD = [
     emoji:"🌿",
     image:"assets/imagen-productos/Hoja-para-Hallaca.webp",
     tiers:[
-      {label:"Consultar precio y stock", qty:1, price:"Consultar precio y stock"},
+      {label:"Consultar precio y stock", qty:1, price: null },
     ]
   },
   {
@@ -1506,7 +1530,7 @@ const NAVIDAD = [
     emoji:"🌿",
     image:"assets/imagen-productos/combo-hallaquero-1.webp",
     tiers:[
-      {label:"Consultar precio y stock", qty:1, price:"Consultar precio y stock"},
+      {label:"Consultar precio y stock", qty:1, price: null },
     ]
   },
   {
@@ -1516,7 +1540,7 @@ const NAVIDAD = [
     emoji:"🌿",
     image:"assets/imagen-productos/combo-hallaquero-2.webp",
     tiers:[
-      {label:"Consultar precio y stock", qty:1, price:"Consultar precio y stock"},
+      {label:"Consultar precio y stock", qty:1, price: null },
     ]
   },
   {
@@ -1526,7 +1550,7 @@ const NAVIDAD = [
     emoji:"🌿",
     image:"assets/imagen-productos/combo-hallaquero-3.webp",
     tiers:[
-      {label:"Consultar precio y stock", qty:1, price:"Consultar precio y stock"},
+      {label:"Consultar precio y stock", qty:1, price: null },
     ]
   },
   {
@@ -2462,9 +2486,11 @@ function renderGrid(){
     // Soportamos productos con tiers o con price/unidad simple
     const hasTiers   = Array.isArray(p.tiers) && p.tiers.length;
     const firstPrice = hasTiers ? p.tiers[0].price : p.price;
+    const isConsult  = (firstPrice == null) || Number.isNaN(Number(firstPrice));
 
     card.innerHTML = `
       <div class="pill">${p.cat || "General"}</div>
+      ${isConsult ? `<div class="consult-badge">Venta por consulta</div>` : ``}
       ${productThumbHTML(p)}
       <div class="body">
         <h3 class="title">${p.name}</h3>
@@ -2474,36 +2500,63 @@ function renderGrid(){
           <select id="${selectId}" class="meta" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:10px">
             ${p.tiers.map((t,i)=>`<option value="${i}">${t.label}</option>`).join("")}
           </select>
-          <div class="price" data-price-for="${selectId}" style="margin-top:8px">${money(firstPrice)}</div>
+          <div class="price ${isConsult ? "price-consultar" : ""}" data-price-for="${selectId}" style="margin-top:8px">${isConsult ? "Consultar precio y stock" : money(Number(firstPrice))}</div>
+          ${isConsult ? `
+          <div class="actions">
+            <button class="btn primary consult" data-act="consult" data-id="${p.id}" data-sel="${selectId}">Consultar por WhatsApp</button>
+          </div>
+          ` : `
           <div class="actions">
             <button class="btn ghost"   data-act="dec" data-id="${p.id}" data-sel="${selectId}">−</button>
             <button class="btn primary" data-act="add" data-id="${p.id}" data-sel="${selectId}">Agregar</button>
             <button class="btn ghost"   data-act="inc" data-id="${p.id}" data-sel="${selectId}">+</button>
           </div>
+          `}
         ` : `
           <div class="meta">${p.unit || ""}</div>
-          <div class="price">${money(firstPrice)}</div>
+          <div class="price ${isConsult ? "price-consultar" : ""}">${isConsult ? "Consultar precio y stock" : money(Number(firstPrice))}</div>
+          ${isConsult ? `
+          <div class="actions">
+            <button class="btn primary consult" data-act="consult" data-id="${p.id}">Consultar por WhatsApp</button>
+          </div>
+          ` : `
           <div class="actions">
             <button class="btn ghost"   data-act="dec" data-id="${p.id}">−</button>
             <button class="btn primary" data-act="add" data-id="${p.id}">Agregar</button>
             <button class="btn ghost"   data-act="inc" data-id="${p.id}">+</button>
           </div>
+          `}
         `}
       </div>
     `;
     grid.appendChild(card);
 
     // Si tiene tiers, actualizar precio al cambiar selección
-    if(hasTiers){
-      const sel = document.getElementById(selectId);
-      sel.addEventListener("change", ()=>{
-        const tier   = p.tiers[ Number(sel.value) ];
-        const priceEl= document.querySelector(`[data-price-for="${selectId}"]`);
-        if(priceEl) priceEl.textContent = money(tier.price);
-      });
+
+if(hasTiers){
+  const sel = document.getElementById(selectId);
+
+  sel.addEventListener("change", ()=>{
+    const tier    = p.tiers[ Number(sel.value) ];
+    const priceEl = document.querySelector(`[data-price-for="${selectId}"]`);
+
+    if(!priceEl) return;
+
+    const priceNum = Number(tier.price);
+    if (tier.price == null || Number.isNaN(priceNum)) {
+      priceEl.textContent = "Consultar precio y stock";
+      priceEl.classList.add("price-consultar");
+    } else {
+      priceEl.textContent = money(priceNum);
+      priceEl.classList.remove("price-consultar");
     }
   });
+
+  sel.dispatchEvent(new Event("change"));
 }
+  });
+}
+
 
 // ====== Carrito ======
 function addToCart(id, delta=1, selId=null){
@@ -2515,6 +2568,16 @@ function addToCart(id, delta=1, selId=null){
   if(item.tiers && selId){
     const sel = document.getElementById(selId);
     if(sel) tierIndex = Number(sel.value || 0);
+  }
+
+
+  // Si el precio es "por consulta", no se agrega al carrito
+  const chosenTier  = (item.tiers && item.tiers[tierIndex]) ? item.tiers[tierIndex] : null;
+  const chosenPrice = chosenTier ? chosenTier.price : item.price;
+  const priceNum    = Number(chosenPrice);
+  if (chosenPrice == null || Number.isNaN(priceNum)) {
+    alert("Este producto se vende por consulta. Escríbenos por WhatsApp para confirmar precio y stock.");
+    return;
   }
 
   const key   = item.tiers ? `${id}::${tierIndex}` : id; // clave única
@@ -2570,6 +2633,28 @@ function renderCart(){
 function saveCart(){ localStorage.setItem("pc_cart", JSON.stringify(state.cart)); }
 function loadCart(){
   try{ state.cart = JSON.parse(localStorage.getItem("pc_cart")) || {}; }catch{ state.cart={}; }
+}
+
+
+// ====== Consulta por WhatsApp (productos sin precio) ======
+function consultWhatsApp(id, selId=null){
+  const item = PRODUCTS.find(x=>x.id===id);
+  if(!item){ return; }
+
+  let tierLabel = "";
+  try{
+    if(item.tiers && selId){
+      const sel = document.getElementById(selId);
+      const t = item.tiers[ Number(sel?.value || 0) ];
+      if(t && t.label) tierLabel = String(t.label);
+    }
+  }catch(_){}
+
+  const detail = tierLabel ? ` (${tierLabel})` : "";
+  const msg = `Hola Punto Caribe 👋\n\nQuiero consultar precio y stock de:\n• ${item.name}${detail}\n\nGracias!`;
+
+  const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER)}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
 }
 
 // ====== WhatsApp Checkout ======
@@ -2789,6 +2874,10 @@ document.addEventListener("click", (e)=>{
   // Acciones desde la tarjeta (usan producto + select de tiers)
   if(act && id){
     const selId = e.target.dataset.sel || null;
+
+    // Productos por consulta
+    if(act==="consult"){ consultWhatsApp(id, selId); return; }
+
     if(act==="add") addToCart(id, +1, selId);
     if(act==="inc") addToCart(id, +1, selId);
     if(act==="dec") addToCart(id, -1, selId);
